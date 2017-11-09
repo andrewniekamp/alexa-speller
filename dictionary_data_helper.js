@@ -22,7 +22,7 @@ class DictionaryDataHelper {
     const options = {
       method: 'GET',
       uri: ENDPOINT + word,
-      resolveWIthFullResponse: true,
+      // resolveWIthFullResponse: true,
       json: true
     };
     return rp(options);
