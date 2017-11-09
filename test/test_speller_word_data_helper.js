@@ -8,8 +8,8 @@ chai.config.includeStack = true;
 const expect = chai.expect;
 
 // Will bring a JSON response of a requested word.
-const DictionaryDataHelper = require('../dictionary_data_helper');
-const wordData = require('../words');
+const DictionaryDataHelper = require('../apps/speller/dictionary_data_helper');
+const wordData = require('../apps/speller/data/words');
 
 describe('DictionaryDataHelper', () => {
   // let dictionaryHelper = new DictionaryDataHelper();
@@ -25,7 +25,7 @@ describe('DictionaryDataHelper', () => {
     })
     context('with a request (with optional grade level arg)', () => {
       it('returns a word included in the grade level specified in the data', () => {
-        let level = 3;
+        let level = 'three';
         let randomWord = DictionaryDataHelper.getRandomWord(level);
         expect(wordData['grade' + level]).to.include(randomWord);
       })

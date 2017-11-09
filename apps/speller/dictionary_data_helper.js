@@ -3,7 +3,7 @@
 const rp = require('request-promise');
 
 const ENDPOINT = 'http://api.pearson.com/v2/dictionaries/entries?headword=';
-const wordData = require('./words');
+const wordData = require('./data/words');
 
 class DictionaryDataHelper {
   constructor() {
@@ -19,8 +19,7 @@ class DictionaryDataHelper {
 
   static getRandomWord(gradeLevel) {
     // Checking for user or Alexa bad input, or no input
-    if (!gradeLevel || typeof gradeLevel !== 'number' || gradeLevel > 8 || gradeLevel < 2) gradeLevel = '2' // TODO: randomize later?
-    gradeLevel = Math.floor(gradeLevel); // In case of float
+    if (!gradeLevel) gradeLevel = 'two' // TODO: randomize later?
     let key = 'grade' + gradeLevel;
     let randomIndex = Math.floor(Math.random() * (wordData[key].length));
     let word = wordData[key][randomIndex];
