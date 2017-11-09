@@ -18,7 +18,6 @@ class DictionaryDataHelper {
   }
 
   getDefinition(word) {
-    this.word = word;
     const options = {
       method: 'GET',
       uri: ENDPOINT + word,
@@ -26,6 +25,13 @@ class DictionaryDataHelper {
       json: true
     };
     return rp(options);
+  }
+
+  formatDefinition(wordInfo) {
+    return _.template('The definition for the word, ${word}, is: "${definition}."')({
+      word: wordInfo.word,
+      definition: wordInfo.definition
+    })
   }
 
 }

@@ -40,6 +40,15 @@ describe('DictionaryDataHelper', () => {
       })
     })
   })
-
-
+  describe('formatDefinition', () => {
+    context('with a normal definition', () => {
+      it('formats the definition, as expected', () => {
+        let testInfo = {
+          definition: 'to scientifically examine a substance or object in order to find out something',
+          word: 'test',
+        };
+        expect(dictionaryHelper.formatDefinition(testInfo)).to.eq('The definition for the word, test, is: "to scientifically examine a substance or object in order to find out something."');
+      })
+    })
+  })
 });
