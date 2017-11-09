@@ -25,7 +25,7 @@ describe('DictionaryDataHelper', () => {
     })
     context('with a request (with optional grade level arg)', () => {
       it('returns a word included in the grade level specified in the data', () => {
-        let level = 'three';
+        let level = '3';
         let randomWord = DictionaryDataHelper.getRandomWord(level);
         expect(wordData['grade' + level]).to.include(randomWord);
       })

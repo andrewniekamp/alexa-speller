@@ -19,8 +19,8 @@ class DictionaryDataHelper {
 
   static getRandomWord(gradeLevel) {
     // Checking for user or Alexa bad input, or no input
-    if (!gradeLevel) gradeLevel = 'two' // TODO: randomize later?
-    let key = 'grade' + gradeLevel;
+    if (!gradeLevel) gradeLevel = '2' // TODO: randomize later?
+    let key = 'grade' + gradeLevel[0]; // Disregard end of 1st, 2nd, 3rd, etc.
     let randomIndex = Math.floor(Math.random() * (wordData[key].length));
     let word = wordData[key][randomIndex];
     return word;

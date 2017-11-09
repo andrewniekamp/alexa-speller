@@ -1,6 +1,6 @@
 const words = {
-    gradetwo: ['bake', 'must', 'fried', 'rip', 'sea'],
-    gradethree: ['flies', 'crawl', 'happen', 'I\'ve', 'build'],
+    grade2: ['bake', 'must', 'fried', 'rip', 'sea'],
+    grade3: ['flies', 'crawl', 'happen', 'I\'ve', 'build'],
   // grade4: {
 
   // },
