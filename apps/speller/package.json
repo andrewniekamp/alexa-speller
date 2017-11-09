@@ -12,6 +12,8 @@
     "applicationId": "blahhh"
   },
   "dependencies": {
-    "alexa-app": "^2.1.0"
+    "alexa-app": "^4.2.0",
+    "dynasty": "^0.2.8",
+    "request-promise": "^4.2.2"
   }
 }

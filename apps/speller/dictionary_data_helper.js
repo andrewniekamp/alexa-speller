@@ -7,7 +7,7 @@ const wordData = require('./data/words');
 
 class DictionaryDataHelper {
   constructor() {
-    this.word = '';
+    this.word = null;
   }
 
   static requestDefinition(word) {
