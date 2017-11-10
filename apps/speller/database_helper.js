@@ -1,47 +1,31 @@
 'use strict';
 
-const SPELLER_TABLE_NAME = 'spellerData';
-// const dynasty = require('dynasty');
+const firebase = require('firebase');
 
-const localUrl = 'http://localhost:8000';
-const localCredentials = {
-  region: 'us-east-1',
-  accessKeyId: 'fake',
-  secretAccessKey: 'fake'
+var config = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: 'alexa-speller.firebaseapp.com',
+  databaseURL: 'https://alexa-speller.firebaseio.com',
+  projectId: 'alexa-speller',
+  storageBucket: 'alexa-speller.appspot.com',
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID
 };
-const localDynasty = require('dynasty')(localCredentials, localUrl);
-const dynasty = localDynasty;
+firebase.initializeApp(config);
 
-const spellerTable = () => {
-  return dynasty.table(SPELLER_TABLE_NAME);
-};
-
-class SpellerHelper {
-
-  static createSpellerTable() {
-    return dynasty.describe(SPELLER_TABLE_NAME)
-    .catch( (err) => {
-      console.log(err);
-      return dynasty.create(SPELLER_TABLE_NAME, {
-        key_schema: {
-          hash: ['userId', 'string']
-        }
-      })
-    })
-  }
+class DatabaseHelper {
 
   static storeWordData(userId, word) {
-    return spellerTable().insert({ userId: userId, data: word })
-    .catch( (err) => console.log(err));
+    return firebase.database().ref('users/' + userId).set({ word })
+    .then( () => 'Success')
+    .catch(console.log);
   }
 
   static readWordData(userId) {
-    return spellerTable().find(userId)
-    .then( (result) => {
-      return result;
-    })
-    .catch( (err) => console.log(err));
+    return firebase.database().ref('/users/' + userId).once('value')
+    .then( (data) => {
+      return data.val().word;
+    });
   }
 }
 
-module.exports = SpellerHelper;
+module.exports = DatabaseHelper;

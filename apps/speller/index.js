@@ -1,4 +1,5 @@
 'use strict';
+require('dotenv').config()
 
 const Alexa = require('alexa-app');
 
@@ -11,10 +12,6 @@ const saveWord = (word, req) => {
   DatabaseHelper.storeWordData(userId, word)
     .then((result) => result)
     .catch((err) => console.log(err));
-}
-
-app.pre = (req, res, type) => {
-  DatabaseHelper.createSpellerTable();
 }
 
 app.launch((req, res) => {
