@@ -3,16 +3,19 @@ require('dotenv').config()
 
 const Alexa = require('alexa-app');
 
+const firebase = require('firebase');
+
+const config = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: 'alexa-speller.firebaseapp.com',
+  databaseURL: 'https://alexa-speller.firebaseio.com',
+  projectId: 'alexa-speller',
+  storageBucket: 'alexa-speller.appspot.com',
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID
+};
+
 const app = new Alexa.app('speller');
 const DictionaryDataHelper = require('./dictionary_data_helper');
-const DatabaseHelper = require('./database_helper');
-
-const saveWord = (word, req) => {
-  const userId = req.userId;
-  DatabaseHelper.storeWordData(userId, word)
-  .then((result) => result)
-  .catch((err) => console.log(err));
-}
 
 app.appId = process.env.ALEXA_APP_ID;
 
@@ -21,12 +24,8 @@ app.launch((req, res) => {
   res.say(prompt).reprompt(prompt).shouldEndSession(false);
 })
 
-app.intent('RandomWord', {
-  slots: {
-    GradeLevel: 'level'
-  },
-  utterances: ['give me a random word', 'give me a word from grade {GradeLevel}']
-}, (req, res) => {
+app.intent('RandomWordIntent', (req, res) => {
+  const fbApp = firebase.initializeApp(config);
   // Get the slot
   const gradeLevel = req.slot('GradeLevel');
   // const reprompt = 'Ask me for a word, and specify by grade two through eight, if you like.';
@@ -36,9 +35,13 @@ app.intent('RandomWord', {
     // Check here for valid input?
     else word = DictionaryDataHelper.getRandomWord(gradeLevel);
 
-    saveWord(word, req); // Passes along req for userId
-
-    res.say('Your word is ' + word + '. Ok, you\'re welcome.').send();
+    const userId = req.userId.split('.').join(''); // Must remove '.' from id
+    return firebase.database().ref(`users/${userId}`).set({ word })
+    .then( () => fbApp.delete())
+    .then( () => {
+      res.say('Your word is ' + word + '. Ok, you\'re welcome.').send();
+    })
+    .catch(console.log);
   }
   catch (err) {
     console.log(err.statusCode);
@@ -48,13 +51,16 @@ app.intent('RandomWord', {
   return false;
 })
 
-app.intent('GetWord', {
-  utterances: ['what is my word', 'repeat the word']
-}, (req, res) => {
-  const userId = req.userId;
-  return DatabaseHelper.readWordData(userId)
-  .then( (result) => {
-    let word = result.data;
+app.intent('GetWordIntent', (req, res) => {
+  const fbApp = firebase.initializeApp(config);
+  const userId = req.userId.split('.').join(''); // Must remove '.' from id
+  let word;
+  return firebase.database().ref('/users/' + userId).once('value')
+  .then( data => {
+    word = data.val().word;
+    return fbApp.delete();
+  })
+  .then( () => {
     return res.say('You want your word again? Ok, it\'s ' + word + '.').shouldEndSession(false).send();
   });
 })
