@@ -10,9 +10,11 @@ const DatabaseHelper = require('./database_helper');
 const saveWord = (word, req) => {
   const userId = req.userId;
   DatabaseHelper.storeWordData(userId, word)
-    .then((result) => result)
-    .catch((err) => console.log(err));
+  .then((result) => result)
+  .catch((err) => console.log(err));
 }
+
+app.appId = process.env.ALEXA_APP_ID;
 
 app.launch((req, res) => {
   const prompt = 'Hello! You can ask me for a word, and specify by grade two through eight, if you like.';

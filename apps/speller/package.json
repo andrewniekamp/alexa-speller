@@ -8,12 +8,10 @@
   },
   "author": "",
   "license": "ISC",
-  "alexa": {
-    "applicationId": "blahhh"
-  },
   "dependencies": {
     "alexa-app": "^4.2.0",
-    "dynasty": "^0.2.8",
+    "dotenv": "^4.0.0",
+    "firebase": "^4.6.2",
     "request-promise": "^4.2.2"
   }
 }
