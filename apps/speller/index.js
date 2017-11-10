@@ -46,9 +46,11 @@ app.intent('RandomWordIntent', (req, res) => {
   catch (err) {
     console.log(err.statusCode);
     let prompt = 'Hmm, something went wrong. Let\'s try again.';
-    res.say(prompt).reprompt(prompt).shouldEndSession(false).send();
+    return fbApp.delete()
+    .then( () => {
+      res.say(prompt).reprompt(prompt).shouldEndSession(false).send();
+    })
   }
-  return false;
 })
 
 app.intent('GetWordIntent', (req, res) => {
@@ -62,6 +64,43 @@ app.intent('GetWordIntent', (req, res) => {
   })
   .then( () => {
     return res.say('You want your word again? Ok, it\'s ' + word + '.').shouldEndSession(false).send();
+  })
+  .catch( (err) => {
+    console.log(err.statusCode);
+    let prompt = 'Hmm, something went wrong. Let\'s try again.';
+    return fbApp.delete()
+    .then( () => {
+      res.say(prompt).reprompt(prompt).shouldEndSession(false).send();
+    })
+  });
+})
+
+app.intent('CheckSpellingIntent', (req, res) => {
+  const fbApp = firebase.initializeApp(config);
+  const userId = req.userId.split('.').join(''); // Must remove '.' from id
+  let spelledWord;
+  if (req.slots.SpellingLetter.value) spelledWord = req.slots.SpellingLetter.value;
+  let word;
+  return firebase.database().ref('/users/' + userId).once('value')
+  .then( data => {
+    word = data.val().word;
+    return fbApp.delete();
+  })
+  .then( () => {
+    if (spelledWord === word) {
+      return res.say('Correct! You are so smart! You spelled ' + word + ' correctly!').shouldEndSession(true).send();
+    } else {
+      // Add reprompt later...
+      return res.say('Hmm... that doesn\'t seem right, but you can try again. In case you forgot, your word is ' + word + '.').shouldEndSession(false).send();
+    }
+  })
+  .catch( (err) => {
+    console.log(err.statusCode);
+    let prompt = 'Hmm, something went wrong. Let\'s try again.';
+    return fbApp.delete()
+    .then( () => {
+      res.say(prompt).reprompt(prompt).shouldEndSession(false).send();
+    })
   });
 })
 
