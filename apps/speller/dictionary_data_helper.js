@@ -26,6 +26,17 @@ class DictionaryDataHelper {
     return word;
   }
 
+  static getSpaces(word) {
+    let wordLines = ''
+    for (let i = 0; i < word.length; i++) { wordLines += '_ ' } // Makes blank spaces for letters
+    wordLines.trim();
+    return wordLines;
+  }
+
+  static formatSpelledWord(spokenInput) {
+    return spokenInput.replace(/[\s\.]/g, '').toLowerCase();
+  }
+
   static getDefinition(word) {
     const options = {
       method: 'GET',

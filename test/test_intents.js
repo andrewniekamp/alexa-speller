@@ -19,13 +19,13 @@ firebase.initializeApp(config);
 
 const expect = chai.expect;
 
-const DatabaseHelper = require('../apps/speller/database_helper');
+// const DatabaseHelper = require('../apps/speller/database_helper');
 
 describe('Intents', () => {
 
   describe('getWord', () => {
     context('with a request with a valid word', () => {
-      it('gets the word', () => {
+      xit('gets the word', () => {
         // THIS WORKS, MUST USE THIS!!!!
         const userId = 'AE3MUH66U';
         let word;

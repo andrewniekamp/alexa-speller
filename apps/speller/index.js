@@ -13,135 +13,84 @@ const config = {
 const Alexa = require('alexa-sdk');
 const APP_ID = process.env.ALEXA_APP_ID;
 
-const DictionaryDataHelper = require('./dictionary_data_helper');
+const WordHelper = require('./dictionary_data_helper');
+const cards = require('./data/cards');
 
 var handlers = {
-  PleaseHelpIntent: function () {
-    this.emit(':tell', 'Hello World!');
-  },
+
   LaunchRequest: function () {
-    let prompt = 'Hello! You can ask me for a word, and specify by grade two through eight, if you like.';
-    let cardTitle = 'Hello.'
-    let cardContent = 'You can ask me for a word, and specify by grade two through eight, if you like.';
-    let imageObj = {
-      smallImageUrl: `https://source.unsplash.com/720x480/?bee`,
-      largeImageUrl: `https://source.unsplash.com/1200x800/?bee`
-    };
-    this.emit(':askWithCard', prompt, prompt, cardTitle, cardContent, imageObj);
+    let card = cards.launchCard;
+    // Save initially for general usage
+    this.attributes.userId = this.event.context.System.user.userId.split('.').join('');
+    this.emit(':askWithCard', card.prompt, card.prompt, card.title, card.content, card.imgObj);
   },
+
   RandomWordIntent: function () {
-    const fbApp = firebase.initializeApp(config);
-    // Get the slot
-    // const gradeLevel = 0;
     const gradeLevel = this.event.request.intent.slots.GradeLevel.value;
-    // const reprompt = 'Ask me for a word, and specify by grade two through eight, if you like.';
     let word;
-    try {
-      if (!gradeLevel) word = DictionaryDataHelper.getRandomWord()
-      // Check here for valid input?
-      else word = DictionaryDataHelper.getRandomWord(gradeLevel);
+    if (!gradeLevel) word = WordHelper.getRandomWord()
+    else word = WordHelper.getRandomWord(gradeLevel);
 
-      const userId = this.event.context.System.user.userId.split('.').join(''); // Must remove '.' from id
-      return firebase.database().ref(`users/${userId}`).set({ word })
-        .then(() => fbApp.delete())
-        .then(() => {
-          let wordLines = ''
-          for (let i = 0; i < word.length; i++) {
-            wordLines += '_ '
-          }
-          wordLines.trim();
-          let cardTitle = wordLines;
-
-          let prompt = `Your word is, ${word}.`;
-          let reprompt = `If you are ready to spell just say, ready, and then spell the word.`
-          let cardContent = 'If you are ready to spell just say, "Ready," and then spell the word.';
-          let imageObj = {
-            smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
-            largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
-          };
-          this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
-        })
-        .catch(console.log);
-    }
-    catch (err) {
-      console.log(err.statusCode);
-      let prompt = 'Hmm, something went wrong. Let\'s try again.';
-      this.emit(':tell', prompt);
-    }
+    this.attributes.word = word;
+    let prompt = `Your word is, ${word}.`;
+    let reprompt = `If you are ready to spell just say, ready, and then spell the word.`;
+    let cardTitle = WordHelper.getSpaces(word); // Gets space placeholders for letters
+    let cardContent = 'If you are ready to spell just say, "Ready," and then spell the word.';
+    let imageObj = {
+      smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
+      largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
+    };
+    this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
   },
+
   GetWordIntent: function () {
-    const fbApp = firebase.initializeApp(config);
-    const userId = this.event.context.System.user.userId.split('.').join(''); // Must remove '.' from id
     let word;
-    return firebase.database().ref('/users/' + userId).once('value')
-      .then(data => {
-        word = data.val().word;
-        return fbApp.delete();
-      })
-      .then(() => {
-        let wordLines = ''
-        for (let i = 0; i < word.length; i++) {
-          wordLines += '_ '
-        }
-        wordLines.trim();
-        let cardTitle = wordLines;
+    if (this.attributes.word) word = this.attributes.word;
+    else this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
 
-        let prompt = `Your word is, ${word}.`;
-        let reprompt = `If you are ready to spell just say, ready, and then spell the word.`
-        let cardContent = 'If you are ready to spell just say, "Ready," and then spell the word.';
-        let imageObj = {
-          smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
-          largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
-        };
-        this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
-      })
-      .catch((err) => {
-        console.log(err.statusCode);
-        let prompt = 'Hmm, something went wrong. Let\'s try again.';
-        this.emit(':tell', prompt);
-      });
+    let cardTitle = WordHelper.getSpaces(word); // Gets space placeholders for letters
+    let prompt = `Your word is, ${word}.`;
+    let reprompt = `If you are ready to spell just say, ready, and then spell the word.`
+    let cardContent = 'If you are ready to spell just say, "Ready," and then spell the word.';
+    let imageObj = {
+      smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
+      largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
+    };
+    this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
   },
-  CheckSpellingIntent: function () {
-    const fbApp = firebase.initializeApp(config);
-    const userId = this.event.context.System.user.userId.split('.').join(''); // Must remove '.' from id
-    let spelledWord;
-    if (this.event.request.intent.slots.SpellingLetter.value) spelledWord = this.event.request.intent.slots.SpellingLetter.value.toLowerCase();
-    let word;
-    return firebase.database().ref('/users/' + userId).once('value')
-    .then( data => {
-      word = data.val().word;
-      return fbApp.delete();
-    })
-    .then( () => {
-      if (spelledWord === word) {
-        let prompt = 'Correct! You are so smart! You spelled ' + word + ' correctly!';
-        return this.emit(':tell', prompt);
-      } else {
-        let wordLines = ''
-        for (let i = 0; i < word.length; i++) {
-          wordLines += '_ '
-        }
-        wordLines.trim();
-        let cardTitle = wordLines;
 
-        let prompt = 'Hmm... that doesn\'t seem right, but you can try again. In case you forgot, your word is ' + word + '.';
-        let reprompt = `If you are ready to spell just say, ready, and then spell the word.`
-        let cardContent = 'If you are ready to spell just say, "Ready," and then spell the word.';
-        let imageObj = {
-          smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
-          largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
-        };
-        this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
-      }
-    })
-    .catch( (err) => {
-      console.log(err.statusCode);
-      return fbApp.delete()
-      .then( () => {
-        let prompt = 'Hmm, something went wrong. Let\'s try again.';
-        this.emit(':tell', prompt);
-      })
-    });
+  CheckSpellingIntent: function () {
+    let word = this.attributes.word;
+    let spelledWord = this.event.request.intent.slots.SpellingLetter.value;
+    if (!word) this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
+    if (spelledWord) spelledWord = WordHelper.formatSpelledWord(spelledWord); // If they spelled something, format it
+    if (spelledWord === word) {
+      let prompt = 'Correct! You are so smart! You spelled ' + word + ' correctly!';
+      // Will want to emit a save to firebase for count of words gotten correct
+      return this.emit(':tell', prompt);
+    } else {
+      let cardTitle = WordHelper.getSpaces(word);
+      let prompt = `Hmm... that doesn't seem right, but you can try again. In case you forgot, your word is ${word}.`;
+      let reprompt = `If you are ready to spell just say, ready, and then spell the word.`;
+      let cardContent = `If you are ready to spell just say, "Ready," and then spell the word.`;
+      let imageObj = {
+        smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
+        largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
+      };
+      this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
+    }
+  },
+  // 'AMAZON.HelpIntent': function () {
+  //   this.emit(':ask', 'Describe the app and what you can ask for--make this a card', 'Try *****.');
+  // },
+
+  // SessionEndedRequest: function () {
+
+  // },
+
+  Unhandled: function () {
+     // test for existence of word, if so, ask them to spell it, otherwise tell them to ask for one
+    this.emit(':ask', 'Sorry, something went wrong. Let\'s try again.', 'Try again.');
   }
 };
 
