@@ -17,12 +17,13 @@ class DictionaryDataHelper {
     })
   }
 
-  static getRandomWord(gradeLevel) {
+  static getRandomWord(level) {
     // Checking for user or Alexa bad input, or no input
-    if (!gradeLevel) gradeLevel = '2' // TODO: randomize later?
-    let key = 'grade' + gradeLevel[0]; // Disregard end of 1st, 2nd, 3rd, etc.
-    let randomIndex = Math.floor(Math.random() * (wordData[key].length));
-    let word = wordData[key][randomIndex];
+    let options = ['easy', 'medium', 'hard'];
+    if (level) level = level.toLowerCase().trim();
+    if (!level || !options.includes(level)) level = options[Math.floor(Math.random() * (options.length))];
+    let randomIndex = Math.floor(Math.random() * (wordData[level].length));
+    let word = wordData[level][randomIndex];
     return word;
   }
 
@@ -35,6 +36,37 @@ class DictionaryDataHelper {
 
   static formatSpelledWord(spokenInput) {
     return spokenInput.replace(/[\s\.]/g, '').toLowerCase();
+  }
+
+  static createWordCard(wordObj, instructions) {
+    if (wordObj) {
+      let { word, part, synonym, definition, examplePre, examplePost, source, reqPart, reqDefinition, reqSynonym, reqExample, reqAnswer } = wordObj;
+      let card = { cardContent: '' };
+      if (reqAnswer) { card.cardContent += `Answer: ${word}\n\n\n`}
+      if (reqPart) { card.cardContent += `Part of Speech: ${part}\n\n` }
+      if (reqSynonym) { card.cardContent += `Synonym: ${synonym}\n\n` }
+      if (reqDefinition) { card.cardContent += `Definition:\n ${definition}\n\n` }
+      let wordLines = DictionaryDataHelper.getSpaces(word);
+      if (reqExample) { card.cardContent += `Example:\n ${examplePre + wordLines + examplePost}\n    ${source}\n\n` }
+
+      if (instructions) card.cardContent += `If you are ready to spell just say "Ready" and then spell the word.\n\nYou can ask for part of speech, synonym, definition, an example, or the answer.`
+
+      card.cardTitle = 'Say "Ready" and then spell the word!';
+      card.imageObj = {
+        smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
+        largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
+      };
+      return card;
+    }
+    // let prompt = `Hmm... that doesn't seem right, but you can try again. In case you forgot, your word is ${word}.`;
+    // let reprompt = `If you are ready to spell just say, ready, and then spell the word.`;
+
+    // let cardTitle = WordHelper.getSpaces(word);
+    // let cardContent = `If you are ready to spell just say, "Ready," and then spell the word.`;
+    // let imageObj = {
+    //   smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
+    //   largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
+    // };
   }
 
   static getDefinition(word) {

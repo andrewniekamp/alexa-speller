@@ -1,21 +1,91 @@
 const words = {
-    grade2: ['bake', 'must', 'fried', 'rip', 'sea'],
-    grade3: ['flies', 'crawl', 'happen', 'I\'ve', 'build'],
-  // grade4: {
-
-  // },
-  // grade5: {
-
-  // },
-  // grade6: {
-
-  // },
-  // grade7: {
-
-  // },
-  // grade8: {
-
-  // }
+    easy: [{
+      word: 'bacon',
+      part: 'noun',
+      synonym: 'pork',
+      definition: 'Cured meat from the sides and belly of a pig. Poor pig.',
+      exampleFull: 'May all your bacon burn',
+      examplePre: 'May all your ',
+      examplePost: ' burn.',
+      source: '    (Calcifer -- Howl\'s Moving Castle)',
+      reqPart: false,
+      reqDefinition: false,
+      reqSynonym: false,
+      reqExample: false,
+      reqAnswer: false
+    }, {
+      word: 'make',
+      part: 'verb',
+      synonym: 'build',
+      definition: 'To produce something.',
+      exampleFull: 'What’s out there? What’s waiting for me? Why was I made? Who made me? And what did they make me for?',
+      examplePre: 'What’s out there? What’s waiting for me? Why was I made? Who made me? And what did they ',
+      examplePost: ' me for?',
+      source: '    (Melfina -- Outlaw Star)',
+      reqPart: false,
+      reqDefinition: false,
+      reqSynonym: false,
+      reqExample: false,
+      reqAnswer: false
+    }],
+    medium: [{
+      word: 'vegetable',
+      part: 'noun',
+      synonym: 'plant',
+      definition: 'A plant or part of a plant used as food, such as a cabbage, carrot, or bean.',
+      exampleFull: 'Huh? Kakarot? What does that mean? Is that a vegetable? I hate vegetables!',
+      examplePre: 'Huh? Kakarot? What does that mean? Is that a ',
+      examplePost: '? I hate vegetables!',
+      source: '    (Goten -- Dragon Ball Z)',
+      reqPart: false,
+      reqDefinition: false,
+      reqSynonym: false,
+      reqExample: false,
+      reqAnswer: false
+    }, {
+      word: 'potato',
+      part: 'noun',
+      synonym: 'tuber',
+      definition: 'A starchy plant that is one of the most important food crops.',
+      exampleFull: 'I will take a potato chip... and EAT IT.',
+      examplePre: 'I will take a ',
+      examplePost: ' chip... and EAT IT.',
+      source: '    (Light Yagami -- Death Note)',
+      reqPart: false,
+      reqDefinition: false,
+      reqSynonym: false,
+      reqExample: false,
+      reqAnswer: false
+    }],
+    difficult: [{
+      word: 'circumstances',
+      part: 'noun',
+      synonym: 'occurances',
+      definition: 'A fact or condition connected with or relevant to an event or action.',
+      exampleFull: 'They say that the best blaze burns brightest when circumstances are at their worst.',
+      examplePre: 'They say that the best blaze burns brightest when ',
+      examplePost: ' are at their worst.',
+      source: '    (Sophia Hatter -- Howl\'s Moving Castle)',
+      reqPart: false,
+      reqDefinition: false,
+      reqSynonym: false,
+      reqExample: false,
+      reqAnswer: false
+    }, {
+      word: 'inspiration',
+      part: 'noun',
+      synonym: 'innovation',
+      definition: 'The process of being stimulated to do or feel something, especially to do something creative.',
+      exampleFull: 'We need to find our own inspiration. Sometimes, it\'s not easy.',
+      examplePre: 'We need to find our own ',
+      examplePost: '. Sometimes, it\'s not easy.',
+      source: '(Ursula -- Kiki\'s Delivery Service)',
+      reqPart: false,
+      reqDefinition: false,
+      reqSynonym: false,
+      reqExample: false,
+      reqAnswer: false
+    }],
 }
 
 module.exports = words;

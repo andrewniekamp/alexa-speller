@@ -25,13 +25,12 @@ var handlers = {
     this.emit(':askWithCard', card.prompt, card.prompt, card.title, card.content, card.imgObj);
   },
 
-  RandomWordIntent: function () {
-    const gradeLevel = this.event.request.intent.slots.GradeLevel.value;
-    let word;
-    if (!gradeLevel) word = WordHelper.getRandomWord()
-    else word = WordHelper.getRandomWord(gradeLevel);
+  GetWordIntent: function () {
+    const level = this.event.request.intent.slots.GradeLevel.value;
+    let wordObj = WordHelper.getRandomWord(level) // Pass in, even if undefined
+    let word = wordObj.word;
+    this.attributes.word = wordObj; // Set entire word object
 
-    this.attributes.word = word;
     let prompt = `Your word is, ${word}.`;
     let reprompt = `If you are ready to spell just say, ready, and then spell the word.`;
     let cardTitle = WordHelper.getSpaces(word); // Gets space placeholders for letters
@@ -43,10 +42,11 @@ var handlers = {
     this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
   },
 
-  GetWordIntent: function () {
-    let word;
-    if (this.attributes.word) word = this.attributes.word;
+  RetrieveWordIntent: function () {
+    let wordObj;
+    if (this.attributes.word) wordObj = this.attributes.word;
     else this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
+    let word = wordObj.word;
 
     let cardTitle = WordHelper.getSpaces(word); // Gets space placeholders for letters
     let prompt = `Your word is, ${word}.`;
@@ -59,11 +59,82 @@ var handlers = {
     this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
   },
 
+  RetrieveDefinitionIntent: function () {
+    if (!this.attributes.word) this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
+    this.attributes.word.reqDefinition = true; // Set bool on session
+    let wordObj = this.attributes.word; // Get wordObj including updated bool
+    let { definition } = wordObj;
+
+    let card = WordHelper.createWordCard(wordObj);
+
+    let prompt = `Here is your definition. ${definition}`;
+    let reprompt = `If you are ready to spell just say, ready, and then spell the word. If you need help, say, help.`;
+
+    this.emit(':askWithCard', prompt, reprompt, card.cardTitle || 'TITLE MISSING!', card.cardContent || 'CONTENT MISSING!', card.imageObj || 'IMAGE MISSING!');
+  },
+
+  RetrieveSynonymIntent: function () {
+    if (!this.attributes.word) this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
+    this.attributes.word.reqSynonym = true; // Set bool on session
+    let wordObj = this.attributes.word; // Get wordObj including updated bool
+    let { synonym } = wordObj;
+
+    let card = WordHelper.createWordCard(wordObj);
+
+    let prompt = `A synonym is ${synonym}`;
+    let reprompt = `If you are ready to spell just say, ready, and then spell the word. If you need help, say, help.`;
+
+    this.emit(':askWithCard', prompt, reprompt, card.cardTitle || 'TITLE MISSING!', card.cardContent || 'CONTENT MISSING!', card.imageObj || 'IMAGE MISSING!');
+  },
+
+  RetrievePartIntent: function () {
+    if (!this.attributes.word) this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
+    this.attributes.word.reqPart = true; // Set bool on session
+    let wordObj = this.attributes.word; // Get wordObj including updated bool
+    let { part } = wordObj;
+
+    let card = WordHelper.createWordCard(wordObj);
+
+    let prompt = `The part of speech is ${part}`;
+    let reprompt = `If you are ready to spell just say, ready, and then spell the word. If you need help, say, help.`;
+
+    this.emit(':askWithCard', prompt, reprompt, card.cardTitle || 'TITLE MISSING!', card.cardContent || 'CONTENT MISSING!', card.imageObj || 'IMAGE MISSING!');
+  },
+
+  RetrieveExampleIntent: function () {
+    if (!this.attributes.word) this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
+    this.attributes.word.reqExample = true; // Set bool on session
+    let wordObj = this.attributes.word; // Get wordObj including updated bool
+    let { exampleFull } = wordObj;
+
+    let card = WordHelper.createWordCard(wordObj);
+
+    let prompt = `Here is your example. ${exampleFull}`;
+    let reprompt = `If you are ready to spell just say, ready, and then spell the word. If you need help, say, help.`;
+
+    this.emit(':askWithCard', prompt, reprompt, card.cardTitle || 'TITLE MISSING!', card.cardContent || 'CONTENT MISSING!', card.imageObj || 'IMAGE MISSING!');
+  },
+
+  RetrieveAnswerIntent: function () {
+    if (!this.attributes.word) this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
+    this.attributes.word.reqAnswer = true; // Set bool on session
+    let wordObj = this.attributes.word; // Get wordObj including updated bool
+    let { word } = wordObj;
+
+    let card = WordHelper.createWordCard(wordObj);
+
+    let prompt = `The word is, ${word}`;
+
+    this.emit(':tellWithCard', prompt, card.cardTitle || 'TITLE MISSING!', card.cardContent || 'CONTENT MISSING!', card.imageObj || 'IMAGE MISSING!');
+  },
+
   CheckSpellingIntent: function () {
-    let word = this.attributes.word;
+    let wordObj = this.attributes.word;
+    let word;
     let spelledWord = this.event.request.intent.slots.SpellingLetter.value;
-    if (!word) this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
+    if (!wordObj) this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
     if (spelledWord) spelledWord = WordHelper.formatSpelledWord(spelledWord); // If they spelled something, format it
+    word = wordObj.word;
     if (spelledWord === word) {
       let prompt = 'Correct! You are so smart! You spelled ' + word + ' correctly!';
       // Will want to emit a save to firebase for count of words gotten correct
@@ -80,9 +151,11 @@ var handlers = {
       this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
     }
   },
-  // 'AMAZON.HelpIntent': function () {
-  //   this.emit(':ask', 'Describe the app and what you can ask for--make this a card', 'Try *****.');
-  // },
+
+  'AMAZON.HelpIntent': function () {
+    let prompt = `If you are ready to spell just say, ready, and then spell the word. You can ask for part of speech, synonym, definition, example, or the answer.`
+    this.emit(':ask', prompt, prompt + 'You can also quit at any time by saying, Alexa, quit.');
+  },
 
   // SessionEndedRequest: function () {
 
