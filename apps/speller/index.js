@@ -26,37 +26,31 @@ var handlers = {
   },
 
   GetWordIntent: function () {
-    const level = this.event.request.intent.slots.GradeLevel.value;
+    const level = this.event.request.intent.slots.Difficulty.value;
     let wordObj = WordHelper.getRandomWord(level) // Pass in, even if undefined
-    let word = wordObj.word;
     this.attributes.word = wordObj; // Set entire word object
+    let { word } = wordObj;
 
-    let prompt = `Your word is, ${word}.`;
-    let reprompt = `If you are ready to spell just say, ready, and then spell the word.`;
-    let cardTitle = WordHelper.getSpaces(word); // Gets space placeholders for letters
-    let cardContent = 'If you are ready to spell just say, "Ready," and then spell the word.';
-    let imageObj = {
-      smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
-      largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
-    };
-    this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
+    let card = WordHelper.createWordCard(wordObj, true); // Flag to get instructions
+
+    let prompt = `Here is your word, ${word}`;
+    let reprompt = `If you are ready to spell just say, ready, and then spell the word. If you need help, say, help.`;
+
+    this.emit(':askWithCard', prompt, reprompt, card.cardTitle || 'TITLE MISSING!', card.cardContent || 'CONTENT MISSING', card.imageObj || 'IMAGE MISSING!');
   },
 
   RetrieveWordIntent: function () {
     let wordObj;
     if (this.attributes.word) wordObj = this.attributes.word;
     else this.emit(':ask', 'You don\'t have a word yet. Do you want one?', 'You don\'t have a word yet.');
-    let word = wordObj.word;
+    let { word } = wordObj;
 
-    let cardTitle = WordHelper.getSpaces(word); // Gets space placeholders for letters
-    let prompt = `Your word is, ${word}.`;
-    let reprompt = `If you are ready to spell just say, ready, and then spell the word.`
-    let cardContent = 'If you are ready to spell just say, "Ready," and then spell the word.';
-    let imageObj = {
-      smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
-      largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
-    };
-    this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
+    let card = WordHelper.createWordCard(wordObj);
+
+    let prompt = `Your word is, ${word}`;
+    let reprompt = `If you are ready to spell just say, ready, and then spell the word. If you need help, say, help.`;
+
+    this.emit(':askWithCard', prompt, reprompt, card.cardTitle || 'TITLE MISSING!', card.cardContent || 'Say "Help" if you need help!', card.imageObj || 'IMAGE MISSING!');
   },
 
   RetrieveDefinitionIntent: function () {
@@ -123,7 +117,9 @@ var handlers = {
 
     let card = WordHelper.createWordCard(wordObj);
 
-    let prompt = `The word is, ${word}`;
+    let spelledWord = WordHelper.getSpelling(word);
+
+    let prompt = `The answer is, ${spelledWord}`;
 
     this.emit(':tellWithCard', prompt, card.cardTitle || 'TITLE MISSING!', card.cardContent || 'CONTENT MISSING!', card.imageObj || 'IMAGE MISSING!');
   },
@@ -141,7 +137,7 @@ var handlers = {
       return this.emit(':tell', prompt);
     } else {
       let cardTitle = WordHelper.getSpaces(word);
-      let prompt = `Hmm... that doesn't seem right, but you can try again. In case you forgot, your word is ${word}.`;
+      let prompt = `Hmm... that doesn't seem right, but you can try again. Your word is ${word}.`;
       let reprompt = `If you are ready to spell just say, ready, and then spell the word.`;
       let cardContent = `If you are ready to spell just say, "Ready," and then spell the word.`;
       let imageObj = {
@@ -153,13 +149,19 @@ var handlers = {
   },
 
   'AMAZON.HelpIntent': function () {
-    let prompt = `If you are ready to spell just say, ready, and then spell the word. You can ask for part of speech, synonym, definition, example, or the answer.`
-    this.emit(':ask', prompt, prompt + 'You can also quit at any time by saying, Alexa, quit.');
+
+    let wordObj = this.attributes.word; // Get wordObj including updated bool
+    let card = WordHelper.createWordCard(wordObj, true); // true for instructions
+
+    let prompt = `If you are ready to spell just say, ready, and then spell the word. You can ask for part of speech, synonym, definition, an example, or the answer.`
+    let reprompt = `You can also quit at any time by saying, Alexa, quit.`;
+
+    this.emit(':askWithCard', prompt, reprompt, card.cardTitle || 'TITLE MISSING!', card.cardContent || 'CONTENT MISSING!', card.imageObj || 'IMAGE MISSING!');
   },
 
-  // SessionEndedRequest: function () {
-
-  // },
+  SessionEndedRequest: function () {
+    this.emit(':tellWithCard', 'Goodbye!', 'Goodbye!', 'Thanks for playing!');
+  },
 
   Unhandled: function () {
      // test for existence of word, if so, ask them to spell it, otherwise tell them to ask for one

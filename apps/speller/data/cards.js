@@ -1,8 +1,8 @@
 const cards = {
   launchCard: {
-    prompt: 'Hello! Let\'s practice your spelling.',
+    prompt: 'Hello! Let\'s practice your spelling. Ask me for a word. If you like, you can specify by easy, medium, or hard difficuly.',
     title: 'Welcome',
-    content: 'You can ask me for a word, and specify by grade two through eight, if you like.',
+    content: 'You can ask me for a word, and specify by easy, medium, or hard difficuly, if you like.',
     imgObj: {
       smallImageUrl: `https://source.unsplash.com/720x480/?bee`, // Bee image
       largeImageUrl: `https://source.unsplash.com/1200x800/?bee` // Bee image

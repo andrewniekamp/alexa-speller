@@ -34,6 +34,15 @@ class DictionaryDataHelper {
     return wordLines;
   }
 
+  static getSpelling(word) {
+    let spelling = ''
+    for (let i = 0; i < word.length; i++) {
+      spelling += word[i] + '. ';
+    }
+    spelling.trim();
+    return spelling;
+  }
+
   static formatSpelledWord(spokenInput) {
     return spokenInput.replace(/[\s\.]/g, '').toLowerCase();
   }
@@ -42,14 +51,14 @@ class DictionaryDataHelper {
     if (wordObj) {
       let { word, part, synonym, definition, examplePre, examplePost, source, reqPart, reqDefinition, reqSynonym, reqExample, reqAnswer } = wordObj;
       let card = { cardContent: '' };
-      if (reqAnswer) { card.cardContent += `Answer: ${word}\n\n\n`}
+      if (reqAnswer) { card.cardContent += `Answer: ${word}\n\n`}
       if (reqPart) { card.cardContent += `Part of Speech: ${part}\n\n` }
       if (reqSynonym) { card.cardContent += `Synonym: ${synonym}\n\n` }
       if (reqDefinition) { card.cardContent += `Definition:\n ${definition}\n\n` }
       let wordLines = DictionaryDataHelper.getSpaces(word);
       if (reqExample) { card.cardContent += `Example:\n ${examplePre + wordLines + examplePost}\n    ${source}\n\n` }
 
-      if (instructions) card.cardContent += `If you are ready to spell just say "Ready" and then spell the word.\n\nYou can ask for part of speech, synonym, definition, an example, or the answer.`
+      if (instructions) card.cardContent = `For example, to spell "cat" you would say:\n\n"Ready c a t"\n\nYou can ask for part of speech, synonym, definition, an example, or the answer.`
 
       card.cardTitle = 'Say "Ready" and then spell the word!';
       card.imageObj = {
