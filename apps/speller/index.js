@@ -132,20 +132,18 @@ var handlers = {
     if (spelledWord) spelledWord = WordHelper.formatSpelledWord(spelledWord); // If they spelled something, format it
     word = wordObj.word;
     if (spelledWord === word) {
+      let card = cards.successCard;
       let prompt = 'Correct! You are so smart! You spelled ' + word + ' correctly! Would you like to play again? If so, say, start over. To quit, say, quit.';
       let reprompt = `Would you like to play again? If so, say, start over. To quit, say, quit.`;
-      // Will want to emit a save to firebase for count of words gotten correct
-      return this.emit(':ask', prompt, reprompt);
+      // Will want to emit a save to firebase for count of words gotten correct?
+      this.emit(':askWithCard', prompt, reprompt, 'Congratulations!', 'You spelled ' + word + ' correctly!', card.imgObj);
     } else {
-      let cardTitle = WordHelper.getSpaces(word);
+      let card = WordHelper.createWordCard(wordObj);
+
       let prompt = `Hmm... that doesn't seem right, but you can try again. Your word is ${word}.`;
-      let reprompt = `If you are ready to spell just say, ready, and then spell the word.`;
-      let cardContent = `If you are ready to spell just say, "Ready," and then spell the word.`;
-      let imageObj = {
-        smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
-        largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
-      };
-      this.emit(':askWithCard', prompt, reprompt, cardTitle, cardContent, imageObj);
+      let reprompt = `If you are ready to spell just say, ready, and then spell the word. If you need help, say, help.`;
+
+      this.emit(':askWithCard', prompt, reprompt, card.cardTitle || 'TITLE MISSING!', card.cardContent || `For example, to spell "cat" you would say:\n\n"Ready c a t"\n\nYou can ask for part of speech, synonym, definition, an example, or the answer.`, card.imageObj || 'IMAGE MISSING!');
     }
   },
 
