@@ -19,7 +19,7 @@ class DictionaryDataHelper {
 
   static getRandomWord(level) {
     // Checking for user or Alexa bad input, or no input
-    let options = ['easy', 'medium', 'hard'];
+    let options = ['easy', 'medium', 'difficult'];
     if (level) level = level.toLowerCase().trim();
     if (!level || !options.includes(level)) level = options[Math.floor(Math.random() * (options.length))];
     let randomIndex = Math.floor(Math.random() * (wordData[level].length));

@@ -47,7 +47,7 @@ const words = {
       part: 'noun',
       synonym: 'tuber',
       definition: 'A starchy plant that is one of the most important food crops.',
-      exampleFull: 'I will take a potato chip... and EAT IT.',
+      exampleFull: 'I will take a potato chip, and eat.',
       examplePre: 'I will take a ',
       examplePost: ' chip... and EAT IT.',
       source: '    (Light Yagami -- Death Note)',
