@@ -1,14 +1,14 @@
 require('dotenv').config()
 
-const firebase = require('firebase');
-const config = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: 'alexa-speller.firebaseapp.com',
-  databaseURL: 'https://alexa-speller.firebaseio.com',
-  projectId: 'alexa-speller',
-  storageBucket: 'alexa-speller.appspot.com',
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID
-};
+// const firebase = require('firebase');
+// const config = {
+//   apiKey: process.env.FIREBASE_API_KEY,
+//   authDomain: 'alexa-speller.firebaseapp.com',
+//   databaseURL: 'https://alexa-speller.firebaseio.com',
+//   projectId: 'alexa-speller',
+//   storageBucket: 'alexa-speller.appspot.com',
+//   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID
+// };
 
 const Alexa = require('alexa-sdk');
 const APP_ID = process.env.ALEXA_APP_ID;
