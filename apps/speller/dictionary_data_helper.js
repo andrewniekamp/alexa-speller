@@ -1,24 +1,42 @@
 'use strict';
 
-const rp = require('request-promise');
-
-const ENDPOINT = 'http://api.pearson.com/v2/dictionaries/entries?headword=';
 const wordData = require('./data/words');
 
 class DictionaryDataHelper {
-  constructor() {
-    this.word = null;
+
+  static hereIsWordPrompt(word) {
+    return `Here is your word, ${word}. If you are ready to spell, just say, ready, and then spell the word. You can ask for part of speech, synonym, definition, an example, or the answer.`
   }
 
-  static requestDefinition(word) {
-    return this.getDefinition(word)
-    .then( res => {
-      return res;
-    })
+  static defaultReprompt() {
+    return `If you are ready to spell just say, ready, and then spell the word. If you need help, say, help. `;
+  }
+
+  static endReprompt() {
+    return `To start over just say, start over. To quit, say, quit. `;
+  }
+
+  static noWordPrompt() {
+    return `You don't have a word yet. `;
+  }
+
+  static needHelpPrompt() {
+    return `If you need help, just say, help. `;
+  }
+
+  static incorrectPrompt() {
+    return `Hmm... that doesn't seem right, but you can try again. `;
+  }
+
+  static helpIntentPrompt() {
+    return `If you are ready to spell just say, ready, and then spell the word. For example, to spell, cat, you would say, ready, c. a. t. You can ask for part of speech, synonym, definition, an example, or the answer.`;
+  }
+
+  static helpIntentReprompt() {
+    return `You can also start over by saying, start over, or quit by saying, quit.`;
   }
 
   static getRandomWord(level) {
-    // Checking for user or Alexa bad input, or no input
     let options = ['easy', 'medium', 'difficult'];
     if (level) level = level.toLowerCase().trim();
     if (!level || !options.includes(level)) level = options[Math.floor(Math.random() * (options.length))];
@@ -61,35 +79,17 @@ class DictionaryDataHelper {
       if (instructions) card.cardContent = `For example, to spell "cat" you would say:\n\n"Ready c a t"\n\nYou can ask for part of speech, synonym, definition, an example, or the answer.`
 
       card.cardTitle = 'Say "Ready" and then spell the word!';
+      // Using unsplash to get the images
       card.imageObj = {
         smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
         largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
       };
       return card;
     }
-    // let prompt = `Hmm... that doesn't seem right, but you can try again. In case you forgot, your word is ${word}.`;
-    // let reprompt = `If you are ready to spell just say, ready, and then spell the word.`;
-
-    // let cardTitle = WordHelper.getSpaces(word);
-    // let cardContent = `If you are ready to spell just say, "Ready," and then spell the word.`;
-    // let imageObj = {
-    //   smallImageUrl: `https://source.unsplash.com/720x480/?${word}`,
-    //   largeImageUrl: `https://source.unsplash.com/1200x800/?${word}`
-    // };
-  }
-
-  static getDefinition(word) {
-    const options = {
-      method: 'GET',
-      uri: ENDPOINT + word,
-      // resolveWIthFullResponse: true,
-      json: true
-    };
-    return rp(options);
   }
 
   static formatDefinition(wordInfo) {
-    return `The definition for the word, ${wordInfo.word}, is: "${wordInfo.definition}."`;
+    return `The definition for the word ${wordInfo.word}, is: "${wordInfo.definition}."`;
   }
 
 }
