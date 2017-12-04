@@ -1,44 +1,38 @@
 
-# Spelling Thing
+# Phoneme
+An Alexa (Amazon Echo) skill for practicing your spelling.
+##### By Andrew Niekamp
 
-## API
+## Setup/Installation
 
-Currently using Pearson
-Example: [Pearson](http://api.pearson.com/v2/dictionaries/entries?headword=test)
+* The 'speller' folder can be zipped and uploaded to AWS.
 
-However, this one is deprecated and will be gone by the end of the year.
-It is free and didn't require signup, I'm waiting on Macmillan's API key registration to complete.
-Will need to update tests for the new API definitions, as they will likely differ.
+## Technologies Used
+
+JavaScript, Node.js, Amazon AWS, Alexa
+
+## Notes I took that might be useful to anyone interested in doing something similar to this:
+
+### API
+
+I intend to leverage a dictionary API for retrieving random words along with definition, part of speech, usage examples, etc.
 
 ### Tests
 
-* Start with tests.
-  * Test for the methods you know you need, like getDefinition, getRandomWord, formatDefinition
-    * The format methods will be to format the string for Alexa's presentation of it.
-  * Using the API required promisified stuff/tests (async).
-  * Mock data might even be better (I added mock words in a separate file as API doesn't get random words)
-
-### Build something to test
-
-* I then made a class with methods to pass the tests, with static methods as there is no apparent need for instances.
-  * Perhaps helper methods would be better/simpler... not sure.
+* Testing is mostly handled in AWS, but helper classes and functions can of course be tested locally. Testing the Alexa skill response/behavior was more of a challenge to run locally.
 
 ### Local server for mock Alexa requests
 
-* Bring in alexa-app-server next, to mock requests locally
-  * Install alexa-app-server, mind the file structure, it is opinionated!
+* If you want to simulate the skill locally, you may want to look into alexa-app-server to mock requests locally.
+  * Install alexa-app-server, carefully minding the file structure.
     * need apps directory with app name folder (speller, in this case)
     * server.js in root to serve the alexa-app-server
     * index.js with Alexa-specific stuff for intents, etc., and a simple package.json inside the specific app folder
 
-### Deployment
-
 #### Prep
 
-* Once some intents are working in the browser UI for alexa-app-server, you are ready to start deploying!
-  * First, address the applicationId: ??get one by starting to make an alexa app in the other UI, copy it into your package.json??
-  * Then, assemble your actual app files and .ZIP them (don't zip the root folder, just zip the actual files inside the app's directory)
-    * index.js, node_modules, package.json, and any other helper scripts
+* Assemble the contents of the folder you're going to deploy. In the case of this repo, 'speller' folder would be deployed (but not the folder itself). I chose to compress (.zip) the contents and upload them to AWS.
+  * For instance: index.js, node_modules, package.json, and any other helper scripts
 
 #### AWS Lambda
 
@@ -66,17 +60,7 @@ Will need to update tests for the new API definitions, as they will likely diffe
 * Name it, and give invocation word(s)
 * Copy in rn into 'Configure' after intitial skill setup
 
-#### Storage?
+#### Storage
 
-##### Local
-
-* dynamodb-local
-* Must download/install Java SE Development Kit
-* (java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb)
-
-##### Cloud
-
-* DynamoDB
-* Add custom role to AWS Lambda
-* Change dynamo/dynasty code to production from dev
-* Can dynamo and use FireBase, keep testing
+* FireBase is probably an easy and affordable solution for quick prototyping. You can also use the session store for each session a user has with the application (very useful for carrying over content between skill intents).
+* You could also use DynamoDB

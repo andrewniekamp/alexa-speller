@@ -8,8 +8,8 @@ chai.config.includeStack = true;
 const expect = chai.expect;
 
 // Will bring a JSON response of a requested word.
-const DictionaryDataHelper = require('../apps/speller/dictionary_data_helper');
-const wordData = require('../apps/speller/data/words');
+const DictionaryDataHelper = require('../speller/dictionary_data_helper');
+const wordData = require('../speller/data/words');
 
 describe('DictionaryDataHelper', () => {
   // let dictionaryHelper = new DictionaryDataHelper();
@@ -17,17 +17,17 @@ describe('DictionaryDataHelper', () => {
 
   describe('getRandomWord', () => {
     context('with a request (without optional grade level arg)', () => {
-      it('returns any word (string)', () => {
+      it('returns any word object', () => {
         let randomWord = DictionaryDataHelper.getRandomWord();
-        expect(typeof randomWord).to.eq('string');
+        expect(typeof randomWord).to.eq('object');
         expect(randomWord.length).to.not.eq(0);
       })
     })
     context('with a request (with optional grade level arg)', () => {
       it('returns a word included in the grade level specified in the data', () => {
-        let level = '3';
+        let level = 'medium';
         let randomWord = DictionaryDataHelper.getRandomWord(level);
-        expect(wordData['grade' + level]).to.include(randomWord);
+        expect(wordData[level]).to.include(randomWord);
       })
     })
   })
@@ -64,7 +64,7 @@ describe('DictionaryDataHelper', () => {
           word: 'test',
           definition: 'to scientifically examine a substance or object in order to find out something'
         };
-        expect(DictionaryDataHelper.formatDefinition(testInfo)).to.eq('The definition for the word, test, is: "to scientifically examine a substance or object in order to find out something."');
+        expect(DictionaryDataHelper.formatDefinition(testInfo)).to.eq('The definition for the word test, is: "to scientifically examine a substance or object in order to find out something."');
       })
     })
   })
